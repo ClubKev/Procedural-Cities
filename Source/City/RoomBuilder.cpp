@@ -407,7 +407,7 @@ static void attemptPlaceAroundPolygon(FPolygon center, FString itemName, TArray<
 		FVector dir = getNormal(center[i%center.points.Num()], center[i - 1], false);
 		float len = tan.Size();
 		tan.Normalize();
-		float numSteps = std::floor(len * density) + 1;
+		float numSteps = floor(len * density) + 1;
 		float stepLen = len / numSteps;
 		for (int j = 1; j < numSteps; j++) {
 			FVector pos = center[i - 1] + tan * j * stepLen;
