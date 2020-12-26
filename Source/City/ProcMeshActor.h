@@ -2,11 +2,12 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "BaseLibrary.h"
-#include "RuntimeMeshComponent/Public/RuntimeMeshComponent.h"
-
+#include "RuntimeMeshComponent.h"
 #include "ProcMeshActor.generated.h"
+
 
 UCLASS()
 class CITY_API AProcMeshActor : public AActor
@@ -22,6 +23,12 @@ public:
 	AProcMeshActor();
 	~AProcMeshActor();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USceneComponent* RootComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	URuntimeMeshComponent* RuntimeMeshComponent;
+
 	UFUNCTION(BlueprintCallable, Category = "Generation")
 	bool buildMaterialPolygons(TArray<FMaterialPolygon> pols, FVector offset);
 
@@ -36,6 +43,7 @@ public:
 		case GenerationMode::procedural_relaxed: maxThreads = 1; break;
 		}
 	}
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = appearance, meta = (AllowPrivateAccess = "true"))
 		UMaterial* exteriorMat;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = appearance, meta = (AllowPrivateAccess = "true"))
@@ -75,7 +83,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	bool buildPolygons(TArray<FPolygon> &pols, FVector offset, URuntimeMeshComponent* mesh, UMaterialInterface *mat);
+	bool buildPolygons(TArray<FPolygon> &pols, FVector offset, URuntimeMeshProviderStatic* mesh, UMaterialInterface *mat);
 
 
 	bool wantsToWork = false;
@@ -83,33 +91,35 @@ private:
 	int currentlyWorkingArray = 0;
 
 
-	UPROPERTY(VisibleAnywhere, Category = Meshes)
-	URuntimeMeshComponent* exteriorMesh;
-	UPROPERTY(VisibleAnywhere, Category = Meshes)
-	URuntimeMeshComponent* interiorMesh;
-	UPROPERTY(VisibleAnywhere, Category = Meshes)
-	URuntimeMeshComponent * windowMesh;
-	UPROPERTY(VisibleAnywhere, Category = Meshes)
-	URuntimeMeshComponent * occlusionWindowMesh;
-	UPROPERTY(VisibleAnywhere, Category = Meshes)
-	URuntimeMeshComponent * windowFrameMesh;
-	UPROPERTY(VisibleAnywhere, Category = Meshes)
-	URuntimeMeshComponent* sndExteriorMesh;
-	UPROPERTY(VisibleAnywhere, Category = Meshes)
-	URuntimeMeshComponent * floorMesh;
-	UPROPERTY(VisibleAnywhere, Category = Meshes)
-	URuntimeMeshComponent * roofMesh;
+
 
 	UPROPERTY(VisibleAnywhere, Category = Meshes)
-		URuntimeMeshComponent * greenMesh;
+		URuntimeMeshProviderStatic* exteriorMesh;
 	UPROPERTY(VisibleAnywhere, Category = Meshes)
-		URuntimeMeshComponent * concreteMesh;
+		URuntimeMeshProviderStatic* interiorMesh;
 	UPROPERTY(VisibleAnywhere, Category = Meshes)
-		URuntimeMeshComponent * roadMiddleMesh;
+		URuntimeMeshProviderStatic* windowMesh;
 	UPROPERTY(VisibleAnywhere, Category = Meshes)
-		URuntimeMeshComponent * asphaltMesh;
+		URuntimeMeshProviderStatic* occlusionWindowMesh;
+	UPROPERTY(VisibleAnywhere, Category = Meshes)
+		URuntimeMeshProviderStatic* windowFrameMesh;
+	UPROPERTY(VisibleAnywhere, Category = Meshes)
+		URuntimeMeshProviderStatic* sndExteriorMesh;
+	UPROPERTY(VisibleAnywhere, Category = Meshes)
+		URuntimeMeshProviderStatic* floorMesh;
+	UPROPERTY(VisibleAnywhere, Category = Meshes)
+		URuntimeMeshProviderStatic* roofMesh;
 
-	TArray<URuntimeMeshComponent*> components;
+	UPROPERTY(VisibleAnywhere, Category = Meshes)
+		URuntimeMeshProviderStatic* greenMesh;
+	UPROPERTY(VisibleAnywhere, Category = Meshes)
+		URuntimeMeshProviderStatic* concreteMesh;
+	UPROPERTY(VisibleAnywhere, Category = Meshes)
+		URuntimeMeshProviderStatic* roadMiddleMesh;
+	UPROPERTY(VisibleAnywhere, Category = Meshes)
+		URuntimeMeshProviderStatic* asphaltMesh;
+
+	TArray<URuntimeMeshProviderStatic*> components;
 	TArray<UMaterialInterface*> materials;
 	TArray<TArray<FPolygon>> polygons;
 

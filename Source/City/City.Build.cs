@@ -6,6 +6,8 @@ public class City : ModuleRules
 {
 	public City(ReadOnlyTargetRules Target) : base (Target)
 	{
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "RuntimeMeshComponent", "ShaderCore", "RenderCore", "RHI"});
+        PrivatePCHHeaderFile = "City.h";
+
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "RuntimeMeshComponent", "RenderCore", "RHI"});
     }
 }

@@ -1,22 +1,26 @@
-// Copyright 2016-2018 Chris Conway (Koderz). All Rights Reserved.
+// Copyright 2016-2020 TriAxis Games L.L.C. All Rights Reserved.
 
 #include "RuntimeMeshActor.h"
 #include "RuntimeMeshComponent.h"
 #include "RuntimeMeshComponentPlugin.h"
+#include "Engine/CollisionProfile.h"
+
 
 
 ARuntimeMeshActor::ARuntimeMeshActor(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
-	, bRunGenerateMeshesOnConstruction(true)
-	, bRunGenerateMeshesOnBeginPlay(false)
 {
+#if ENGINE_MAJOR_VERSION >= 4 && ENGINE_MINOR_VERSION >= 24
+	SetCanBeDamaged(false);
+#else
 	bCanBeDamaged = false;
+#endif
 
 	RuntimeMeshComponent = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("RuntimeMeshComponent0"));
 	RuntimeMeshComponent->SetCollisionProfileName(UCollisionProfile::BlockAll_ProfileName);
 	RuntimeMeshComponent->Mobility = EComponentMobility::Static;
-	RuntimeMeshComponent->SetGenerateOverlapEvents(false);
 
+	RuntimeMeshComponent->SetGenerateOverlapEvents(false);
 	RootComponent = RuntimeMeshComponent;
 }
 
@@ -52,38 +56,5 @@ EComponentMobility::Type ARuntimeMeshActor::GetMobility()
 		return RuntimeMeshComponent->Mobility;
 	}
 	return EComponentMobility::Static;
-}
-
-void ARuntimeMeshActor::OnConstruction(const FTransform& Transform)
-{
-	if (bRunGenerateMeshesOnConstruction)
-	{
-		GenerateMeshes();
-	}
-}
-
-void ARuntimeMeshActor::BeginPlay()
-{
-	bool bIsGameWorld = GetWorld() && GetWorld()->IsGameWorld() && !GetWorld()->IsPreviewWorld() && !GetWorld()->IsEditorWorld();
-
-	bool bHadSerializedMeshData = false;
-	if (RuntimeMeshComponent)
-	{
-		URuntimeMesh* Mesh = RuntimeMeshComponent->GetRuntimeMesh();
-		if (Mesh)
-		{
-			bHadSerializedMeshData = Mesh->HasSerializedMeshData();
-		}
-	}
-
-	if ((bIsGameWorld && !bHadSerializedMeshData) || bRunGenerateMeshesOnBeginPlay)
-	{
-		GenerateMeshes();
-	}
-}
-
-void ARuntimeMeshActor::GenerateMeshes_Implementation()
-{
-
 }
 

@@ -1,28 +1,64 @@
 #pragma once
 
 #include "City.h"
+#include "RuntimeMeshComponent.h"
+#include "Providers/RuntimeMeshProviderStatic.h"
 #include "ProcMeshActor.h"
 #include "polypartition.h"
+
 
 // Sets default values
 
 
 unsigned int AProcMeshActor::workersWorking{ 0 };
+
 AProcMeshActor::AProcMeshActor()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	exteriorMesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("exteriorMesh"));
-	sndExteriorMesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("sndExteriorMesh"));
-	interiorMesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("interiorMesh"));
-	windowMesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("windowMesh"));
-	windowFrameMesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("windowFrameMesh"));
-	occlusionWindowMesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("occlusionWindowMesh"));
-	floorMesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("floorMesh"));
-	roofMesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("roofMesh"));
-	greenMesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("greenMesh"));
-	concreteMesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("concreteMesh"));
-	roadMiddleMesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("roadMiddleMesh"));
-	asphaltMesh = CreateDefaultSubobject<URuntimeMeshComponent>(TEXT("asphaltMesh"));
+
+	RootComp = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	RootComponent = RootComp;
+
+	RuntimeMeshComponent = NewObject<URuntimeMeshComponent>(this, "TestRMC");
+	RuntimeMeshComponent->SetupAttachment(RootComp);
+	RuntimeMeshComponent->RegisterComponent();
+		/*
+	URuntimeMeshProviderStatic* exteriorMesh = NewObject<URuntimeMeshProviderStatic>(this, TEXT("exteriorMesh"));
+	RuntimeMeshComponent->Initialize(exteriorMesh);
+
+	URuntimeMeshProviderStatic* sndExteriorMesh = NewObject<URuntimeMeshProviderStatic>(this, TEXT("sndExteriorMesh"));
+	RuntimeMeshComponent->Initialize(sndExteriorMesh);
+
+	URuntimeMeshProviderStatic* interiorMesh = NewObject<URuntimeMeshProviderStatic>(this, TEXT("interiorMesh"));
+	RuntimeMeshComponent->Initialize(interiorMesh);
+
+	URuntimeMeshProviderStatic* windowMesh = NewObject<URuntimeMeshProviderStatic>(this, TEXT("windowMesh"));
+	RuntimeMeshComponent->Initialize(windowMesh);
+
+	URuntimeMeshProviderStatic* windowFrameMesh = NewObject<URuntimeMeshProviderStatic>(this, TEXT("windowFrameMesh"));
+	RuntimeMeshComponent->Initialize(windowFrameMesh);
+
+	URuntimeMeshProviderStatic* occlusionWindowMesh = NewObject<URuntimeMeshProviderStatic>(this, TEXT("occlusionWindowMesh"));
+	RuntimeMeshComponent->Initialize(occlusionWindowMesh);
+
+	URuntimeMeshProviderStatic* floorMesh = NewObject<URuntimeMeshProviderStatic>(this, TEXT("floorMesh"));
+	RuntimeMeshComponent->Initialize(floorMesh);
+	
+	URuntimeMeshProviderStatic* roofMesh = NewObject<URuntimeMeshProviderStatic>(this, TEXT("roofMesh"));
+	RuntimeMeshComponent->Initialize(roofMesh);
+	
+	URuntimeMeshProviderStatic* greenMesh = NewObject<URuntimeMeshProviderStatic>(this, TEXT("greenMesh"));
+	RuntimeMeshComponent->Initialize(greenMesh);
+	
+	URuntimeMeshProviderStatic* concreteMesh = NewObject<URuntimeMeshProviderStatic>(this, TEXT("concreteMesh"));
+	RuntimeMeshComponent->Initialize(concreteMesh);
+	
+	URuntimeMeshProviderStatic* roadMiddleMesh = NewObject<URuntimeMeshProviderStatic>(this, TEXT("roadMiddleMesh"));
+	RuntimeMeshComponent->Initialize(roadMiddleMesh);
+	
+	URuntimeMeshProviderStatic* asphaltMesh = NewObject<URuntimeMeshProviderStatic>(this, TEXT("asphaltMesh"));
+	RuntimeMeshComponent->Initialize(asphaltMesh);*/
+
 	SetActorTickEnabled(false);
 
 }
@@ -47,11 +83,12 @@ AProcMeshActor::~AProcMeshActor()
 
 
 
-bool AProcMeshActor::buildPolygons(TArray<FPolygon> &pols, FVector offset, URuntimeMeshComponent* mesh, UMaterialInterface *mat) {
-	if (mesh->GetNumSections() > 0 || pols.Num() == 0) {
+bool AProcMeshActor::buildPolygons(TArray<FPolygon> &pols, FVector offset, URuntimeMeshProviderStatic* mesh, UMaterialInterface *mat) {
+	
+	/*if (mesh->GetNumSections() > 0 || pols.Num() == 0) {
 		return false;
-	}
-
+	}*/
+	
 	TArray<FVector> vertices;
 	TArray<int32> triangles;
 	TArray<FVector2D> UV;
@@ -103,12 +140,11 @@ bool AProcMeshActor::buildPolygons(TArray<FPolygon> &pols, FVector offset, URunt
 		current += pol.points.Num();
 	}
 
+	URuntimeMeshProviderStatic* blah = NewObject<URuntimeMeshProviderStatic>(this, TEXT("blah"));
+	RuntimeMeshComponent->Initialize(blah);
 
-
-
-	mesh->SetMaterial(0, mat);
-	mesh->CreateMeshSection(0, vertices, triangles, normals, UV, vertexColors, tangents, proceduralMeshesCollision, EUpdateFrequency::Infrequent);
-
+	mesh->SetupMaterialSlot(0, TEXT("mat"), mat);
+	mesh->CreateSectionFromComponents(0, 0, 0, vertices, triangles, normals, UV, vertexColors, tangents, ERuntimeMeshUpdateFrequency::Infrequent, true);
 
 	return true;
 }
@@ -117,19 +153,19 @@ bool AProcMeshActor::buildPolygons(TArray<FPolygon> &pols, FVector offset, URunt
 
 bool AProcMeshActor::clearMeshes(bool fullReplacement) {
 	if (fullReplacement) {
-		exteriorMesh->ClearAllMeshSections();
-		sndExteriorMesh->ClearAllMeshSections();
+	/*	exteriorMesh->ClearSection(0,0);
+	/*	sndExteriorMesh->ClearAllMeshSections();
 		greenMesh->ClearAllMeshSections();
 		concreteMesh->ClearAllMeshSections();
-		roofMesh->ClearAllMeshSections();
+		roofMesh->ClearAllMeshSections();*/
 	}
-	interiorMesh->ClearAllMeshSections();
+	/*interiorMesh->ClearAllMeshSections();
 	windowMesh->ClearAllMeshSections();
 	windowFrameMesh->ClearAllMeshSections();
 	occlusionWindowMesh->ClearAllMeshSections();
 	floorMesh->ClearAllMeshSections();
 	roadMiddleMesh->ClearAllMeshSections();
-	asphaltMesh->ClearAllMeshSections();
+	asphaltMesh->ClearAllMeshSections();*/
 	return true;
 }
 
